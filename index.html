@@ -38,20 +38,25 @@
     to { opacity: 1; }
   }
 
-  /* Hasło */
-  .content {
-    position: absolute;
-    top: 50%;
-    width: 90%;
+  /* Kontener na wszystko: używamy flexbox, żeby wycentrować tekst */
+  .container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    padding: 2rem; /* odstęp od krawędzi */
     text-align: center;
-    transform: translateY(-50%);
     z-index: 1;
-    text-shadow: 0 4px 20px rgba(0,0,0,0.7);
+    position: relative;
   }
 
   h1 {
     font-size: clamp(1.8rem, 5vw, 3rem);
-    line-height: 1.2;
+    line-height: 1.4;
+    text-shadow: 0 4px 20px rgba(0,0,0,0.7);
+    background: rgba(0,0,0,0.3); /* lekki półprzezroczysty box, żeby tekst był czytelny */
+    padding: 1rem 2rem;
+    border-radius: 12px;
   }
 
   /* Rakiety */
@@ -71,7 +76,7 @@
 
 <div class="stars"></div>
 
-<div class="content">
+<div class="container">
   <h1>Nie tego się spodziewałeś?<br>My też nie.</h1>
 </div>
 
@@ -82,8 +87,8 @@
   // Generujemy gwiazdy
   const starContainer = document.querySelector('.stars');
   const starCount = 100;
-  const width = window.innerWidth;
-  const height = window.innerHeight;
+  let width = window.innerWidth;
+  let height = window.innerHeight;
 
   for (let i = 0; i < starCount; i++) {
     const star = document.createElement('div');
@@ -136,8 +141,8 @@
 
   // Odświeżamy szerokość i wysokość przy zmianie rozmiaru
   window.addEventListener('resize', () => {
-    window.innerWidth = document.documentElement.clientWidth;
-    window.innerHeight = document.documentElement.clientHeight;
+    width = window.innerWidth;
+    height = window.innerHeight;
   });
 </script>
 
