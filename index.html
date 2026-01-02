@@ -5,9 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Nie tego się spodziewałeś?</title>
 
-<!-- GOATCOUNTER -->
+<!-- GoatCounter – GLOBAL PATH -->
+<script>
+  window.goatcounter = { path: 'global' };
+</script>
 <script data-goatcounter="https://spermersi.goatcounter.com/count"
-        async src="//gc.zgo.at/count.js"></script>
+        async src="https://gc.zgo.at/count.js"></script>
 
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -42,46 +45,21 @@
 
   .container {
     display: flex;
-    flex-direction: column;
     justify-content: center;
     align-items: center;
     height: 100%;
     padding: 2rem;
     text-align: center;
-    position: relative;
     z-index: 1;
+    position: relative;
   }
 
   h1 {
     font-size: clamp(1.8rem, 5vw, 3rem);
     line-height: 1.4;
-    background: rgba(0,0,0,0.35);
+    background: rgba(0,0,0,0.3);
     padding: 1rem 2rem;
     border-radius: 12px;
-    margin-bottom: 1.5rem;
-  }
-
-  /* PROGRESS BAR */
-  .progress-wrapper {
-    width: 100%;
-    max-width: 420px;
-    background: rgba(255,255,255,0.15);
-    border-radius: 999px;
-    overflow: hidden;
-    height: 18px;
-  }
-
-  .progress-bar {
-    height: 100%;
-    width: 0%;
-    background: linear-gradient(90deg, #ff7675, #ffeaa7);
-    transition: width 1.2s ease;
-  }
-
-  .progress-text {
-    margin-top: 0.5rem;
-    font-size: 0.9rem;
-    opacity: 0.8;
   }
 
   .rocket {
@@ -94,6 +72,60 @@
     .rocket { width: 40px; }
     h1 { font-size: 1.6rem; }
   }
+
+  /* CTA + Progress */
+  #cta-wrapper {
+    position: fixed;
+    bottom: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    width: min(90%, 420px);
+    z-index: 2;
+  }
+
+  #cta-wrapper a {
+    display: inline-block;
+    margin-bottom: 12px;
+    padding: 10px 22px;
+    background: #00aaff;
+    color: #000;
+    font-weight: 600;
+    text-decoration: none;
+    border-radius: 999px;
+    transition: transform 0.2s ease, background 0.2s ease;
+  }
+
+  #cta-wrapper a:hover {
+    background: #00ffcc;
+    transform: scale(1.05);
+  }
+
+  #progress-container {
+    width: 100%;
+    height: 20px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+    font-size: 12px;
+  }
+
+  #progress-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #00ffcc, #00aaff);
+    transition: width 0.6s ease;
+  }
+
+  #progress-label {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    line-height: 20px;
+    top: 0;
+    left: 0;
+  }
 </style>
 </head>
 
@@ -103,87 +135,84 @@
 
 <div class="container">
   <h1>Nie tego się spodziewałeś?<br>My też nie.</h1>
-
-  <div class="progress-wrapper">
-    <div class="progress-bar" id="progress"></div>
-  </div>
-  <div class="progress-text" id="progressText">
-    Ładowanie liczby odwiedzin…
-  </div>
 </div>
 
 <div id="rockets"></div>
 
+<!-- CTA + Progress -->
+<div id="cta-wrapper">
+  <a href="http://onet.pl" target="_blank" rel="noopener">Spróbujesz?</a>
+  <div id="progress-container">
+    <div id="progress-bar"></div>
+    <div id="progress-label">0 / 1000 wyświetleń</div>
+  </div>
+</div>
+
 <script>
-/* GWIAZDY */
-const starContainer = document.querySelector('.stars');
-const starCount = 100;
-let width = window.innerWidth;
-let height = window.innerHeight;
+  /* Gwiazdy */
+  const starContainer = document.querySelector('.stars');
+  const starCount = 100;
 
-for (let i = 0; i < starCount; i++) {
-  const star = document.createElement('div');
-  star.className = 'star';
-  const size = Math.random() * 2 + 1;
-  star.style.width = `${size}px`;
-  star.style.height = `${size}px`;
-  star.style.top = `${Math.random() * height}px`;
-  star.style.left = `${Math.random() * width}px`;
-  starContainer.appendChild(star);
-}
+  for (let i = 0; i < starCount; i++) {
+    const star = document.createElement('div');
+    star.className = 'star';
+    const size = Math.random() * 2 + 1;
+    star.style.width = `${size}px`;
+    star.style.height = `${size}px`;
+    star.style.top = `${Math.random() * window.innerHeight}px`;
+    star.style.left = `${Math.random() * window.innerWidth}px`;
+    starContainer.appendChild(star);
+  }
 
-/* RAKIETY */
-function createRocket() {
-  const rocket = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  rocket.setAttribute("class", "rocket");
-  rocket.setAttribute("viewBox", "0 0 100 200");
-  rocket.innerHTML = `
-    <rect x="40" y="60" width="20" height="80" rx="10" fill="#ccc"/>
-    <polygon points="50,20 70,60 30,60" fill="#fff"/>
-    <circle cx="50" cy="80" r="7" fill="#090a0f"/>
-    <polygon points="40,140 30,170 40,170" fill="#ff7675"/>
-    <polygon points="60,140 70,170 60,170" fill="#ff7675"/>
-  `;
-  document.getElementById('rockets').appendChild(rocket);
+  /* Rakiety */
+  function createRocket() {
+    const rocket = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    rocket.setAttribute("class", "rocket");
+    rocket.setAttribute("viewBox", "0 0 100 200");
+    rocket.innerHTML = `
+      <rect x="40" y="60" width="20" height="80" rx="10" fill="#ccc"/>
+      <polygon points="50,20 70,60 30,60" fill="#fff"/>
+      <circle cx="50" cy="80" r="7" fill="#090a0f"/>
+      <polygon points="40,140 30,170 40,170" fill="#ff7675"/>
+      <polygon points="60,140 70,170 60,170" fill="#ff7675"/>
+    `;
+    document.getElementById('rockets').appendChild(rocket);
 
-  rocket.style.left = `${Math.random() * (window.innerWidth - 60)}px`;
+    rocket.style.left = `${Math.random() * (window.innerWidth - 60)}px`;
 
-  rocket.animate([
-    { transform: 'translateY(0)' },
-    { transform: `translateY(-${window.innerHeight + 200}px)` }
-  ], {
-    duration: 5000 + Math.random() * 3000,
-    easing: 'linear'
-  }).onfinish = () => {
-    rocket.remove();
-    createRocket();
-  };
-}
+    rocket.animate(
+      [{ transform: 'translateY(0)' },
+       { transform: `translateY(-${window.innerHeight + 200}px)` }],
+      { duration: 5000 + Math.random() * 3000, easing: 'linear' }
+    ).onfinish = () => {
+      rocket.remove();
+      createRocket();
+    };
+  }
 
-for (let i = 0; i < 3; i++) setTimeout(createRocket, i * 1000);
+  for (let i = 0; i < 3; i++) setTimeout(createRocket, i * 1000);
 
-/* PROGRESS BAR – GOATCOUNTER */
-const GOAL = 1000;
+  /* Progress bar – GoatCounter */
+  async function loadCounter() {
+    try {
+      const res = await fetch(
+        'https://spermersi.goatcounter.com/counter.json?path=global',
+        { cache: 'no-store' }
+      );
+      const data = await res.json();
+      const count = data.count || 0;
+      const max = 1000;
+      const percent = Math.min((count / max) * 100, 100);
 
-fetch('https://spermersi.goatcounter.com/counter.json')
-  .then(res => res.json())
-  .then(data => {
-    const visits = data.count;
-    const percent = Math.min(visits / GOAL * 100, 100);
+      document.getElementById('progress-bar').style.width = percent + '%';
+      document.getElementById('progress-label').textContent =
+        `${count} / ${max} wyświetleń`;
+    } catch (e) {
+      console.warn('Nie udało się pobrać danych licznika');
+    }
+  }
 
-    document.getElementById('progress').style.width = percent + '%';
-    document.getElementById('progressText').innerText =
-      `${visits} / ${GOAL} wyświetleń`;
-  })
-  .catch(() => {
-    document.getElementById('progressText').innerText =
-      'Nie udało się pobrać danych';
-  });
-
-window.addEventListener('resize', () => {
-  width = window.innerWidth;
-  height = window.innerHeight;
-});
+  loadCounter();
 </script>
 
 </body>
