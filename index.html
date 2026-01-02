@@ -4,8 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Nie tego się spodziewałeś?</title>
+
+<!-- GOATCOUNTER -->
+<script data-goatcounter="https://spermersi.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+
 <style>
-  /* Reset */
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   html, body {
@@ -16,12 +20,10 @@
     color: #fff;
   }
 
-  /* Gwiazdy */
   .stars {
     position: absolute;
     width: 100%;
     height: 100%;
-    background: transparent;
     z-index: -2;
   }
 
@@ -38,28 +40,50 @@
     to { opacity: 1; }
   }
 
-  /* Kontener na wszystko: używamy flexbox, żeby wycentrować tekst */
   .container {
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     height: 100%;
-    padding: 2rem; /* odstęp od krawędzi */
+    padding: 2rem;
     text-align: center;
-    z-index: 1;
     position: relative;
+    z-index: 1;
   }
 
   h1 {
     font-size: clamp(1.8rem, 5vw, 3rem);
     line-height: 1.4;
-    text-shadow: 0 4px 20px rgba(0,0,0,0.7);
-    background: rgba(0,0,0,0.3); /* lekki półprzezroczysty box, żeby tekst był czytelny */
+    background: rgba(0,0,0,0.35);
     padding: 1rem 2rem;
     border-radius: 12px;
+    margin-bottom: 1.5rem;
   }
 
-  /* Rakiety */
+  /* PROGRESS BAR */
+  .progress-wrapper {
+    width: 100%;
+    max-width: 420px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 999px;
+    overflow: hidden;
+    height: 18px;
+  }
+
+  .progress-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #ff7675, #ffeaa7);
+    transition: width 1.2s ease;
+  }
+
+  .progress-text {
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+    opacity: 0.8;
+  }
+
   .rocket {
     position: absolute;
     width: 60px;
@@ -72,78 +96,94 @@
   }
 </style>
 </head>
+
 <body>
 
 <div class="stars"></div>
 
 <div class="container">
   <h1>Nie tego się spodziewałeś?<br>My też nie.</h1>
+
+  <div class="progress-wrapper">
+    <div class="progress-bar" id="progress"></div>
+  </div>
+  <div class="progress-text" id="progressText">
+    Ładowanie liczby odwiedzin…
+  </div>
 </div>
 
-<!-- Kontener na rakiety -->
 <div id="rockets"></div>
 
 <script>
-  // Generujemy gwiazdy
-  const starContainer = document.querySelector('.stars');
-  const starCount = 100;
-  let width = window.innerWidth;
-  let height = window.innerHeight;
+/* GWIAZDY */
+const starContainer = document.querySelector('.stars');
+const starCount = 100;
+let width = window.innerWidth;
+let height = window.innerHeight;
 
-  for (let i = 0; i < starCount; i++) {
-    const star = document.createElement('div');
-    star.className = 'star';
-    const size = Math.random() * 2 + 1;
-    star.style.width = `${size}px`;
-    star.style.height = `${size}px`;
-    star.style.top = `${Math.random() * height}px`;
-    star.style.left = `${Math.random() * width}px`;
-    starContainer.appendChild(star);
-  }
+for (let i = 0; i < starCount; i++) {
+  const star = document.createElement('div');
+  star.className = 'star';
+  const size = Math.random() * 2 + 1;
+  star.style.width = `${size}px`;
+  star.style.height = `${size}px`;
+  star.style.top = `${Math.random() * height}px`;
+  star.style.left = `${Math.random() * width}px`;
+  starContainer.appendChild(star);
+}
 
-  // Funkcja tworząca rakietę
-  function createRocket() {
-    const rocket = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    rocket.setAttribute("class", "rocket");
-    rocket.setAttribute("viewBox", "0 0 100 200");
-    rocket.innerHTML = `
-      <rect x="40" y="60" width="20" height="80" rx="10" fill="#ccc"/>
-      <polygon points="50,20 70,60 30,60" fill="#fff"/>
-      <circle cx="50" cy="80" r="7" fill="#090a0f"/>
-      <polygon points="40,140 30,170 40,170" fill="#ff7675"/>
-      <polygon points="60,140 70,170 60,170" fill="#ff7675"/>
-    `;
-    document.getElementById('rockets').appendChild(rocket);
+/* RAKIETY */
+function createRocket() {
+  const rocket = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  rocket.setAttribute("class", "rocket");
+  rocket.setAttribute("viewBox", "0 0 100 200");
+  rocket.innerHTML = `
+    <rect x="40" y="60" width="20" height="80" rx="10" fill="#ccc"/>
+    <polygon points="50,20 70,60 30,60" fill="#fff"/>
+    <circle cx="50" cy="80" r="7" fill="#090a0f"/>
+    <polygon points="40,140 30,170 40,170" fill="#ff7675"/>
+    <polygon points="60,140 70,170 60,170" fill="#ff7675"/>
+  `;
+  document.getElementById('rockets').appendChild(rocket);
 
-    // Losowa pozycja początkowa
-    const startX = Math.random() * (window.innerWidth - 60);
-    rocket.style.left = `${startX}px`;
-    rocket.style.bottom = `-120px`;
+  rocket.style.left = `${Math.random() * (window.innerWidth - 60)}px`;
 
-    // Animacja w górę
-    const duration = 5000 + Math.random() * 3000; // 5-8s
-    rocket.animate([
-      { transform: `translateY(0px)` },
-      { transform: `translateY(-${window.innerHeight + 150}px)` }
-    ], {
-      duration: duration,
-      easing: 'linear'
-    }).onfinish = () => {
-      rocket.remove();
-      createRocket(); // Tworzymy nową rakietę w pętli
-    };
-  }
+  rocket.animate([
+    { transform: 'translateY(0)' },
+    { transform: `translateY(-${window.innerHeight + 200}px)` }
+  ], {
+    duration: 5000 + Math.random() * 3000,
+    easing: 'linear'
+  }).onfinish = () => {
+    rocket.remove();
+    createRocket();
+  };
+}
 
-  // Uruchamiamy kilka rakiet na start
-  for (let i = 0; i < 3; i++) {
-    setTimeout(createRocket, i * 1000);
-  }
+for (let i = 0; i < 3; i++) setTimeout(createRocket, i * 1000);
 
-  // Odświeżamy szerokość i wysokość przy zmianie rozmiaru
-  window.addEventListener('resize', () => {
-    width = window.innerWidth;
-    height = window.innerHeight;
+/* PROGRESS BAR – GOATCOUNTER */
+const GOAL = 1000;
+
+fetch('https://spermersi.goatcounter.com/counter.json')
+  .then(res => res.json())
+  .then(data => {
+    const visits = data.count;
+    const percent = Math.min(visits / GOAL * 100, 100);
+
+    document.getElementById('progress').style.width = percent + '%';
+    document.getElementById('progressText').innerText =
+      `${visits} / ${GOAL} wyświetleń`;
+  })
+  .catch(() => {
+    document.getElementById('progressText').innerText =
+      'Nie udało się pobrać danych';
   });
+
+window.addEventListener('resize', () => {
+  width = window.innerWidth;
+  height = window.innerHeight;
+});
 </script>
 
 </body>
